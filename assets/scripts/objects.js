@@ -1,31 +1,61 @@
-const movieList = document.getElementById('movie-list');
-movieList.style['backgroundColor'] = 'red';
-movieList.style.display = 'block';
+const addMovieButton = document.getElementById("add-movie-btn");
+const searchButton = document.getElementById("search-btn");
 
-const userChosenKeyName = 'level';
+const movies = [];
 
-let person = {
-    'first name': 'Max',
-    age: 30,
-    hobbies: ['Sports', 'Cooking'],
-    [userChosenKeyName]: 'ggg',
-    greet: function() {
-        alert('Hi there!')
-    },
-    1.5: 'hello'
+const renderMovies = (filter = '') => {
+    const movieList = document.getElementById('movie-list');
+
+    if (movies.length === 0) {
+        movieList.classList.remove('visible');
+        return;
+    } else {
+        movieList.classList.add('visible');
+    }
+    movieList.innerHTML = '';
+
+    const filteredMovies = !filter ?
+        movies :
+        movies.filter(movie => movie.info.title.includes(filter));
+
+    filteredMovies.forEach((movie) => {
+        const movieEl = document.createElement('li');
+        let text = movie.info.title + '_';
+        for (const key in movie.info) {
+            if (key !== 'title') {
+                text = text + `${key}: ${movie.info[key]}`;
+            }
+        }
+        movieEl.textContent = text;
+        movieList.append(movieEl);
+    })
 };
 
-const keyName = userChosenKeyName;
+const addMovieHandler = () => {
+    const title = document.getElementById('title').value;
+    const extraName = document.getElementById('extra-name').value;
+    const extraValue = document.getElementById('extra-value').value;
 
-person.isAdmin = true; //add
-// delete person.age;
-person.age = null;
-// console.log(person['first name']);
-console.log(person[1.5]);
-console.log(person[keyName]);
+    if (title.trim() === '' || extraName.trim() === '' || extraValue.trim() === '') {
+        return
+    }
+    const newMovie = {
+        info: {
+            title,
+            [extraName]: extraValue
+        },
+        id: Math.random().toString()
 
-// const propKey = 'field 12';
-// const person = {
-//     [propKey]: 'Max'
-// };
-// console.log(person['field 12']);
+    };
+
+    movies.push(newMovie);
+    renderMovies();
+};
+
+const searchMovieHandler = () => {
+    const filterTerm = document.getElementById('filter-title').value;
+    renderMovies(filterTerm);
+}
+
+addMovieButton.addEventListener('click', addMovieHandler);
+searchButton.addEventListener('click', searchMovieHandler);
