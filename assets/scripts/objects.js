@@ -1,5 +1,6 @@
-const addMovieButton = document.getElementById("add-movie-btn");
-const searchButton = document.getElementById("search-btn");
+'use strict'
+const addMovieBtn = document.getElementById('add-movie-btn');
+const searchBtn = document.getElementById('search-btn');
 
 const movies = [];
 
@@ -18,17 +19,22 @@ const renderMovies = (filter = '') => {
         movies :
         movies.filter(movie => movie.info.title.includes(filter));
 
-    filteredMovies.forEach((movie) => {
+    filteredMovies.forEach(movie => {
         const movieEl = document.createElement('li');
-        let text = movie.info.title + '_';
-        for (const key in movie.info) {
+        const { info, ...otherProps } = movie;
+        console.log(otherProps);
+        // const { title: movieTitle } = info;
+        let { getFormattedTitle } = movie;
+        getFormattedTitle = getFormattedTitle.bind(movie);
+        let text = movie.getFormattedTitle() + ' - ';
+        for (const key in info) {
             if (key !== 'title') {
-                text = text + `${key}: ${movie.info[key]}`;
+                text = text + `${key}: ${info[key]}`;
             }
         }
         movieEl.textContent = text;
         movieList.append(movieEl);
-    })
+    });
 };
 
 const addMovieHandler = () => {
@@ -36,16 +42,23 @@ const addMovieHandler = () => {
     const extraName = document.getElementById('extra-name').value;
     const extraValue = document.getElementById('extra-value').value;
 
-    if (title.trim() === '' || extraName.trim() === '' || extraValue.trim() === '') {
-        return
+    if (
+        title.trim() === '' ||
+        extraName.trim() === '' ||
+        extraValue.trim() === ''
+    ) {
+        return;
     }
+
     const newMovie = {
         info: {
             title,
             [extraName]: extraValue
         },
-        id: Math.random().toString()
-
+        id: Math.random().toString(),
+        getFormattedTitle() {
+            return this.info.title.toUpperCase();
+        }
     };
 
     movies.push(newMovie);
@@ -55,7 +68,7 @@ const addMovieHandler = () => {
 const searchMovieHandler = () => {
     const filterTerm = document.getElementById('filter-title').value;
     renderMovies(filterTerm);
-}
+};
 
-addMovieButton.addEventListener('click', addMovieHandler);
-searchButton.addEventListener('click', searchMovieHandler);
+addMovieBtn.addEventListener('click', addMovieHandler);
+searchBtn.addEventListener('click', searchMovieHandler);
